@@ -1,0 +1,10 @@
+php artisan module:make-request CategoryRequest Blog
+php artisan module:migrate-refresh
+php artisan module:migrate:fresh Blog
+php artisan module:make-model Events Events
+php artisan module:make-controller PostsController Blog
+
+Repository in Laravel
+    1.Design pattern in OO programming.
+    2.Middle person between Model and Controller.
+    3.
