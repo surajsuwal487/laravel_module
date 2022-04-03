@@ -22,13 +22,15 @@ class ProductsController extends Controller
 
     public function index()
     {
-        $products = Product::latest()->with('catWithProduct')->get();
+        $products = $this->ProductRepository->index();
+        // $products = Product::latest()->with('catWithProduct')->get();
         return view('blog::products.index', compact('products'));
     }
 
 
     public function create()
     {
+        // $categories = $this->ProductRepository->create()
         $categories = Category::all();
         return view('blog::products.create', compact('categories'));
     }
@@ -42,7 +44,7 @@ class ProductsController extends Controller
             'price' => $request->price,
             'description' => $request->description,
         ];
-        $this->ProductRepository->store1($data);
+        $this->ProductRepository->store($data);
         // $product = Product::create($product);
         return redirect()->back()->with('status', 'Product Info Added Successfully');
     }
@@ -52,7 +54,7 @@ class ProductsController extends Controller
     {
         $categories = Category::all();
         // $product = Product::find($id);
-        $product = $this->ProductRepository->edit1($id);
+        $product = $this->ProductRepository->edit($id);
         return view('blog::products.edit', compact('categories'), compact('product'));
 
         // return view('blog::products.edit', compact('product'));
@@ -74,8 +76,8 @@ class ProductsController extends Controller
 
     public function destory($id)
     {
-        $product = Product::find($id);
-        $product = $this->ProductRepository->destory1($id);
+        // $product = Product::find($id);
+        $this->ProductRepository->destory($id);
         // $product->delete();
         return redirect()->back()->with('status', 'Product Info Deleted Successfully');
     }

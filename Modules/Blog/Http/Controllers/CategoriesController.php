@@ -2,21 +2,28 @@
 
 namespace Modules\Blog\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Blog\Entities\Category;
 use Illuminate\Support\Facades\File;
 use Modules\Blog\Http\Requests\CategoryRequest;
 use Modules\Blog\Http\Requests\CategoryUpdateRequest;
+use Modules\Blog\Repository\CategoryRepository;
 
 class CategoriesController extends Controller
 {
+
+
+    private $CategoryRepository;
+    public function __construct(CategoryRepository $CategoryRepository)
+    {
+        $this->CategoryRepository = $CategoryRepository;
+    }
+
+
     public function index()
     {
-        $categories = Category::all();
-
-        // passing through associative array to loop over in our UI 
+        $categories = $this->CategoryRepository->index();
+        // $categories = Category::all();
         return view('blog::categories.index', compact('categories'));
     }
 
@@ -29,32 +36,34 @@ class CategoriesController extends Controller
 
     public function store(CategoryRequest $request)
     {
-        //data
+
         $data = [
             'name' => $request->name,
             'description' => $request->description,
         ];
 
         if ($request->hasFile('image_path')) {
-            $category['image_path'] = time() . '-' . $request->name . '.' . $request->image_path->extension();
-            $request->image_path->move(public_path('images'), $category['image_path']);
+            $data['image_path'] = time() . '-' . $request->name . '.' . $request->image_path->extension();
+            $request->image_path->move(public_path('images'), $data['image_path']);
         }
 
-        $category = Category::create($data);
+        $this->CategoryRepository->store($data);
+        // Category::create($data);
         return redirect()->back()->with('status', 'Categories Info Added Successfully');
     }
 
 
     public function edit($id)
     {
-        $category = Category::find($id);
+        $category = $this->CategoryRepository->edit($id);
+        // $category = Category::find($id);
         return view('blog::categories.edit', compact('category'));
     }
 
     public function update(CategoryUpdateRequest $request, $id)
     {
         // $category = Category::findorfail($id);
-        $category = [
+        $data = [
             'name' => $request->name,
             'description' => $request->description
         ];
@@ -64,7 +73,7 @@ class CategoriesController extends Controller
             $request->image_path->move(public_path('images'), $category['image_path']);
         }
 
-        Category::where('id', $id)->update($category);
+        Category::where('id', $id)->update($data);
 
         return redirect()->back()->with('status', 'Categories Info Updated Successfully');
     }
@@ -76,7 +85,7 @@ class CategoriesController extends Controller
         if (File::exists($destination)) {
             File::delete($destination);
         }
-        $category->delete();
+        $this->CategoryRepository->destory($id);
         return redirect()->back()->with('status', 'Categories Info Deleted Successfully Successfully');
     }
 }

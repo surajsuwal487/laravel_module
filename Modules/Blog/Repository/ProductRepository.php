@@ -3,22 +3,28 @@
 namespace Modules\Blog\Repository;
 
 use  Modules\Blog\Entities\Product;
+use  Modules\Blog\Entities\Category;
 use PhpParser\Node\Stmt\TryCatch;
 
 class ProductRepository
 {
-    //global
+    //Model property in class instance
     private $model;
 
-    //object
+    //constructor to bind Model to Reopository
     public function __construct(Product $model)
     {
         $this->model = $model;
     }
 
-    
+    //Functions
+    public function index()
+    {
+        return $this->model::latest()->with('catWithProduct')->get();
+    }
 
-    public function store1($data)
+
+    public function store($data)
     {
         try {
             $data = $this->model->create($data);
@@ -28,20 +34,24 @@ class ProductRepository
         }
     }
 
-    public function edit1($id)
+    public function edit($id)
     {
         return $this->model->find($id);
     }
 
-    public function update1($data){
+
+    public function update($data)
+    {
         try {
             $data = $this->model->update($data);
-        } catch (\Exception $e){
+        } catch (\Exception $e) {
             return $e->getMessage();
         }
     }
 
-    public function destory1($id){
-        return $this->model->delete($id);
+    public function destory($id)
+    {
+
+        return $this->model->destroy($id);
     }
 }
